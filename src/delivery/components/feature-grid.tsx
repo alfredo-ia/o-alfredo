@@ -2,7 +2,7 @@
 
 import type { Feature } from '@domain_models/index'
 import { features } from '@engines/features'
-import { motion } from 'framer-motion'
+import { motion, useReducedMotion, type Variants } from 'framer-motion'
 import type { LucideIcon } from 'lucide-react'
 import {
 	Brain,
@@ -47,16 +47,22 @@ const categoryColors: Record<string, string> = {
 	'developer-experience': '#f694ff',
 }
 
-function FeatureCard({ feature, index }: { feature: Feature; index: number }) {
+function FeatureCard({ feature }: { feature: Feature }) {
 	const Icon = iconMap[feature.icon]
 	const color = categoryColors[feature.category] ?? '#00a0df'
+	const prefersReducedMotion = useReducedMotion()
+
+	const spring = prefersReducedMotion ? { duration: 0 } : { type: 'spring' as const, stiffness: 300, damping: 24 }
+
+	const itemVariants: Variants = {
+		hidden: { opacity: 0, y: 20 },
+		visible: { opacity: 1, y: 0, transition: spring },
+	}
 
 	return (
 		<motion.div
-			initial={{ opacity: 0, y: 20 }}
-			whileInView={{ opacity: 1, y: 0 }}
-			viewport={{ once: true }}
-			transition={{ duration: 0.4, delay: index * 0.05 }}
+			variants={itemVariants}
+			whileHover={{ y: -4, transition: spring }}
 			className="group relative rounded-2xl border border-white/5 bg-white/[0.02] p-6 transition-all hover:border-white/10 hover:bg-white/[0.04]"
 		>
 			<div className="mb-4 flex h-10 w-10 items-center justify-center rounded-xl" style={{ backgroundColor: `${color}15` }}>
@@ -72,14 +78,33 @@ function FeatureCard({ feature, index }: { feature: Feature; index: number }) {
  * Grid de features — inspiração rogo.ai feature cards.
  */
 export function FeatureGrid() {
+	const prefersReducedMotion = useReducedMotion()
+
+	const spring = prefersReducedMotion ? { duration: 0 } : { type: 'spring' as const, stiffness: 300, damping: 24 }
+
+	const sectionVariants: Variants = {
+		hidden: { opacity: 0, y: 20 },
+		visible: { opacity: 1, y: 0, transition: spring },
+	}
+
+	const containerVariants: Variants = {
+		hidden: {},
+		visible: {
+			transition: {
+				staggerChildren: 0.04,
+			},
+		},
+	}
+
 	return (
 		<section id="features" className="relative py-32">
 			<div className="pointer-events-none absolute left-0 top-1/3 h-[500px] w-[500px] rounded-full bg-[#00a0df]/5 blur-[120px]" />
 
 			<div className="mx-auto max-w-7xl px-6">
 				<motion.div
-					initial={{ opacity: 0, y: 20 }}
-					whileInView={{ opacity: 1, y: 0 }}
+					variants={sectionVariants}
+					initial="hidden"
+					whileInView="visible"
 					viewport={{ once: true }}
 					className="mb-16 text-center"
 				>
@@ -90,11 +115,17 @@ export function FeatureGrid() {
 					</p>
 				</motion.div>
 
-				<div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-					{features.map((feature, i) => (
-						<FeatureCard key={feature.id} feature={feature} index={i} />
+				<motion.div
+					variants={containerVariants}
+					initial="hidden"
+					whileInView="visible"
+					viewport={{ once: true }}
+					className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3"
+				>
+					{features.map((feature) => (
+						<FeatureCard key={feature.id} feature={feature} />
 					))}
-				</div>
+				</motion.div>
 			</div>
 		</section>
 	)

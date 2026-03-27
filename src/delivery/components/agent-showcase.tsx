@@ -2,7 +2,7 @@
 
 import type { AgentProfile } from '@domain_models/index'
 import { agents } from '@engines/agents'
-import { motion } from 'framer-motion'
+import { motion, useReducedMotion, type Variants } from 'framer-motion'
 import type { LucideIcon } from 'lucide-react'
 import { Crown, Database, GitBranch, Hammer, Scale, Search, Shield, Sparkles } from 'lucide-react'
 
@@ -17,15 +17,21 @@ const iconMap: Record<string, LucideIcon> = {
 	Database,
 }
 
-function AgentCard({ agent, index }: { agent: AgentProfile; index: number }) {
+function AgentCard({ agent }: { agent: AgentProfile }) {
 	const Icon = iconMap[agent.icon]
+	const prefersReducedMotion = useReducedMotion()
+
+	const spring = prefersReducedMotion ? { duration: 0 } : { type: 'spring' as const, stiffness: 300, damping: 24 }
+
+	const itemVariants: Variants = {
+		hidden: { opacity: 0, y: 30 },
+		visible: { opacity: 1, y: 0, transition: spring },
+	}
 
 	return (
 		<motion.div
-			initial={{ opacity: 0, y: 30 }}
-			whileInView={{ opacity: 1, y: 0 }}
-			viewport={{ once: true }}
-			transition={{ duration: 0.4, delay: index * 0.08 }}
+			variants={itemVariants}
+			whileHover={{ y: -4, transition: spring }}
 			className="group relative rounded-2xl border border-white/5 bg-white/[0.02] p-6 transition-all hover:border-white/10 hover:bg-white/[0.04]"
 		>
 			{/* Glow accent */}
@@ -70,6 +76,24 @@ function AgentCard({ agent, index }: { agent: AgentProfile; index: number }) {
  * Showcase dos 8 agentes do Panteão — inspiração ohmyopenagent.com grid.
  */
 export function AgentShowcase() {
+	const prefersReducedMotion = useReducedMotion()
+
+	const spring = prefersReducedMotion ? { duration: 0 } : { type: 'spring' as const, stiffness: 300, damping: 24 }
+
+	const sectionVariants: Variants = {
+		hidden: { opacity: 0, y: 20 },
+		visible: { opacity: 1, y: 0, transition: spring },
+	}
+
+	const containerVariants: Variants = {
+		hidden: {},
+		visible: {
+			transition: {
+				staggerChildren: 0.06,
+			},
+		},
+	}
+
 	return (
 		<section id="agents" className="relative py-32">
 			{/* Background glow */}
@@ -78,8 +102,9 @@ export function AgentShowcase() {
 			<div className="mx-auto max-w-7xl px-6">
 				{/* Section header */}
 				<motion.div
-					initial={{ opacity: 0, y: 20 }}
-					whileInView={{ opacity: 1, y: 0 }}
+					variants={sectionVariants}
+					initial="hidden"
+					whileInView="visible"
 					viewport={{ once: true }}
 					className="mb-16 text-center"
 				>
@@ -92,11 +117,17 @@ export function AgentShowcase() {
 				</motion.div>
 
 				{/* Agent grid */}
-				<div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-					{agents.map((agent, i) => (
-						<AgentCard key={agent.id} agent={agent} index={i} />
+				<motion.div
+					variants={containerVariants}
+					initial="hidden"
+					whileInView="visible"
+					viewport={{ once: true }}
+					className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4"
+				>
+					{agents.map((agent) => (
+						<AgentCard key={agent.id} agent={agent} />
 					))}
-				</div>
+				</motion.div>
 			</div>
 		</section>
 	)

@@ -1,21 +1,52 @@
 'use client'
 
 import { cliCommands } from '@engines/cli'
-import { motion } from 'framer-motion'
+import { motion, useReducedMotion, type Variants } from 'framer-motion'
+
+const spring = { type: 'spring' as const, stiffness: 300, damping: 24 }
+
+const sectionVariants: Variants = {
+	hidden: { opacity: 0, y: 20 },
+	visible: { opacity: 1, y: 0, transition: spring },
+}
+
+const terminalVariants: Variants = {
+	hidden: { opacity: 0, y: 30 },
+	visible: {
+		opacity: 1,
+		y: 0,
+		transition: { ...spring, staggerChildren: 0.05 },
+	},
+}
+
+const headerVariants: Variants = {
+	hidden: { opacity: 0 },
+	visible: { opacity: 1, transition: spring },
+}
+
+const lineVariants: Variants = {
+	hidden: { opacity: 0, x: -20 },
+	visible: { opacity: 1, x: 0, transition: spring },
+}
 
 /**
  * Seção CLI — terminal visual com comandos reais do Alfredo.
  */
 export function CliSection() {
+	const prefersReduced = useReducedMotion()
+	const noMotion = { duration: 0 }
+
 	return (
 		<section id="cli" className="relative py-32">
 			<div className="pointer-events-none absolute left-1/3 top-1/2 h-[400px] w-[400px] -translate-y-1/2 rounded-full bg-[#61ffca]/5 blur-[120px]" />
 
 			<div className="mx-auto max-w-7xl px-6">
 				<motion.div
-					initial={{ opacity: 0, y: 20 }}
-					whileInView={{ opacity: 1, y: 0 }}
+					variants={sectionVariants}
+					initial="hidden"
+					whileInView="visible"
 					viewport={{ once: true }}
+					transition={prefersReduced ? noMotion : undefined}
 					className="mb-16 text-center"
 				>
 					<span className="mb-4 inline-block text-sm font-medium text-[#61ffca]">CLI</span>
@@ -27,28 +58,32 @@ export function CliSection() {
 
 				{/* Terminal window */}
 				<motion.div
-					initial={{ opacity: 0, y: 30 }}
-					whileInView={{ opacity: 1, y: 0 }}
+					variants={terminalVariants}
+					initial="hidden"
+					whileInView="visible"
 					viewport={{ once: true }}
+					transition={prefersReduced ? noMotion : undefined}
 					className="mx-auto max-w-3xl overflow-hidden rounded-2xl border border-white/10 bg-[#0a0a0a]"
 				>
-					{/* Terminal header */}
-					<div className="flex items-center gap-2 border-b border-white/5 px-4 py-3">
+					{/* Terminal header — aparece antes dos comandos via sequential variant */}
+					<motion.div
+						variants={headerVariants}
+						transition={prefersReduced ? noMotion : undefined}
+						className="flex items-center gap-2 border-b border-white/5 px-4 py-3"
+					>
 						<div className="h-3 w-3 rounded-full bg-[#ff5f57]" />
 						<div className="h-3 w-3 rounded-full bg-[#febc2e]" />
 						<div className="h-3 w-3 rounded-full bg-[#28c840]" />
 						<span className="ml-4 text-xs text-muted-foreground">terminal</span>
-					</div>
+					</motion.div>
 
 					{/* Terminal body */}
 					<div className="space-y-3 p-6 font-mono text-sm">
-						{cliCommands.map((cmd, i) => (
+						{cliCommands.map((cmd) => (
 							<motion.div
 								key={cmd.command}
-								initial={{ opacity: 0, x: -10 }}
-								whileInView={{ opacity: 1, x: 0 }}
-								viewport={{ once: true }}
-								transition={{ delay: i * 0.06 }}
+								variants={lineVariants}
+								transition={prefersReduced ? noMotion : undefined}
 								className="flex items-start gap-3"
 							>
 								<span className="shrink-0 text-[#61ffca]">$</span>

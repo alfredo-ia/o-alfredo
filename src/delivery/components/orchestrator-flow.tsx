@@ -2,7 +2,7 @@
 
 import { agents } from '@engines/agents'
 import { orchestrationModes } from '@engines/orchestration'
-import { motion } from 'framer-motion'
+import { motion, useReducedMotion, type Variants } from 'framer-motion'
 
 const agentColorMap = Object.fromEntries(agents.map((a) => [a.id, a.color]))
 
@@ -11,14 +11,56 @@ const agentColorMap = Object.fromEntries(agents.map((a) => [a.id, a.color]))
  * Inspiração ohmyopenagent.com "Think, Then Act" flow.
  */
 export function OrchestratorFlow() {
+	const prefersReducedMotion = useReducedMotion()
+
+	const spring = prefersReducedMotion ? { duration: 0 } : { type: 'spring' as const, stiffness: 300, damping: 24 }
+
+	const sectionVariants: Variants = {
+		hidden: { opacity: 0, y: 20 },
+		visible: { opacity: 1, y: 0, transition: spring },
+	}
+
+	const modesContainerVariants: Variants = {
+		hidden: {},
+		visible: {
+			transition: {
+				staggerChildren: 0.15,
+			},
+		},
+	}
+
+	const modeCardVariants: Variants = {
+		hidden: { opacity: 0, y: 30 },
+		visible: {
+			opacity: 1,
+			y: 0,
+			transition: spring,
+		},
+	}
+
+	const stepsContainerVariants: Variants = {
+		hidden: {},
+		visible: {
+			transition: {
+				staggerChildren: 0.03,
+			},
+		},
+	}
+
+	const stepVariants: Variants = {
+		hidden: { opacity: 0, y: 10 },
+		visible: { opacity: 1, y: 0, transition: spring },
+	}
+
 	return (
 		<section id="orchestration" className="relative py-32">
 			<div className="pointer-events-none absolute right-1/4 top-0 h-[500px] w-[500px] rounded-full bg-[#61ffca]/5 blur-[120px]" />
 
 			<div className="mx-auto max-w-7xl px-6">
 				<motion.div
-					initial={{ opacity: 0, y: 20 }}
-					whileInView={{ opacity: 1, y: 0 }}
+					variants={sectionVariants}
+					initial="hidden"
+					whileInView="visible"
 					viewport={{ once: true }}
 					className="mb-16 text-center"
 				>
@@ -29,15 +71,15 @@ export function OrchestratorFlow() {
 					</p>
 				</motion.div>
 
-				<div className="grid gap-8 lg:grid-cols-2">
+				<motion.div
+					variants={modesContainerVariants}
+					initial="hidden"
+					whileInView="visible"
+					viewport={{ once: true }}
+					className="grid gap-8 lg:grid-cols-2"
+				>
 					{orchestrationModes.map((mode) => (
-						<motion.div
-							key={mode.id}
-							initial={{ opacity: 0, y: 30 }}
-							whileInView={{ opacity: 1, y: 0 }}
-							viewport={{ once: true }}
-							className="rounded-2xl border border-white/5 bg-white/[0.02] p-8"
-						>
+						<motion.div key={mode.id} variants={modeCardVariants} className="rounded-2xl border border-white/5 bg-white/[0.02] p-8">
 							{/* Mode header */}
 							<div className="mb-6">
 								<div className="mb-2 flex items-center gap-2">
@@ -48,12 +90,12 @@ export function OrchestratorFlow() {
 							</div>
 
 							{/* Steps */}
-							<div className="space-y-2">
+							<motion.div variants={stepsContainerVariants} className="space-y-2">
 								{mode.steps.map((step, i) => {
 									const color = step.agent ? (agentColorMap[step.agent] ?? '#00a0df') : step.isGate ? '#ef4444' : '#525252'
 
 									return (
-										<div key={step.id} className="flex items-center gap-3">
+										<motion.div key={step.id} variants={stepVariants} className="flex items-center gap-3">
 											{/* Step number */}
 											<div
 												className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg text-xs font-bold"
@@ -90,13 +132,13 @@ export function OrchestratorFlow() {
 													{step.agent}
 												</span>
 											)}
-										</div>
+										</motion.div>
 									)
 								})}
-							</div>
+							</motion.div>
 						</motion.div>
 					))}
-				</div>
+				</motion.div>
 			</div>
 		</section>
 	)
