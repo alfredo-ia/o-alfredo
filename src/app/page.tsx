@@ -4,6 +4,7 @@ import { CliSection } from '@delivery/components/cli-section'
 import { FeatureGrid } from '@delivery/components/feature-grid'
 import { Footer } from '@delivery/components/footer'
 import { Hero } from '@delivery/components/hero'
+import { Integrations } from '@delivery/components/integrations'
 import { Navigation } from '@delivery/components/navigation'
 import { OrchestratorFlow } from '@delivery/components/orchestrator-flow'
 import { Testimonials } from '@delivery/components/testimonials'
@@ -23,6 +24,7 @@ export default function Home() {
 				<OrchestratorFlow />
 				<FeatureGrid />
 				<CliSection />
+				<Integrations />
 				<Testimonials />
 				<CallToAction />
 			</main>
