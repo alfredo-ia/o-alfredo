@@ -8,7 +8,7 @@ export const navigationItems: readonly NavigationItem[] = [
 	{ label: 'Features', href: '#features' },
 	{ label: 'Fluxo', href: '#orchestration' },
 	{ label: 'CLI', href: '#cli' },
-	{ label: 'GitHub', href: 'https://github.com/alfredo-ia/alfredo' },
+	{ label: 'Integrações', href: '#integrations' },
 ] as const
 
 /**
