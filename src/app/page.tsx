@@ -7,12 +7,11 @@ import { Hero } from '@delivery/components/hero'
 import { Integrations } from '@delivery/components/integrations'
 import { Navigation } from '@delivery/components/navigation'
 import { OrchestratorFlow } from '@delivery/components/orchestrator-flow'
-import { Testimonials } from '@delivery/components/testimonials'
 
 /**
  * Landing page institucional do Alfredo — o-alfredo.ia.br.
  * Composição de todas as seções seguindo ordem narrativa:
- * apresentação → agentes → orquestração → features → CLI → testimonials → CTA → footer.
+ * apresentação → agentes → orquestração → features → CLI → integrações → CTA → footer.
  */
 export default function Home() {
 	return (
@@ -25,7 +24,6 @@ export default function Home() {
 				<FeatureGrid />
 				<CliSection />
 				<Integrations />
-				<Testimonials />
 				<CallToAction />
 			</main>
 			<Footer />
